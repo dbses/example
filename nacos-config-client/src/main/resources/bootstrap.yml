@@ -6,7 +6,9 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8848 #Nacos地址
+        server-addr: 10.17.32.191:8848 #Nacos地址
       config:
-        server-addr: localhost:8848 #Nacos地址
+        namespace: ${spring.profiles.active}
+        group: infra
+        server-addr: 10.17.32.191:8848 #Nacos地址
         file-extension: yaml #这里我们获取的yaml格式的配置
