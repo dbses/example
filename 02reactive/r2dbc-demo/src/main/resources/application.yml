@@ -1,0 +1,5 @@
+spring:
+   r2dbc:
+     url: r2dbcs:mysql://localhost:3306/r2dbcs_account?SSL=false&sslMode=DISABLED&useUnicode=true&characterEncoding=UTF-8
+     username: root
+     password: 123456
