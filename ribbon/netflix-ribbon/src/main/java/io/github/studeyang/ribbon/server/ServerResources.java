@@ -17,25 +17,17 @@
  */
 package io.github.studeyang.ribbon.server;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
+import com.google.common.collect.Lists;
+import com.thoughtworks.xstream.XStream;
+import org.codehaus.jackson.map.ObjectMapper;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-
-import org.codehaus.jackson.map.ObjectMapper;
-
-import com.google.common.collect.Lists;
-import com.thoughtworks.xstream.XStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
 
 @Path("/testAsync")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -45,16 +37,21 @@ public class ServerResources {
     public static class Person {
         public String name;
         public int age;
-        public Person() {}
+
+        public Person() {
+        }
+
         public Person(String name, int age) {
             super();
             this.name = name;
             this.age = age;
         }
+
         @Override
         public String toString() {
             return "Person [name=" + name + ", age=" + age + "]";
         }
+
         @Override
         public int hashCode() {
             final int prime = 31;
@@ -63,6 +60,7 @@ public class ServerResources {
             result = prime * result + ((name == null) ? 0 : name.hashCode());
             return result;
         }
+
         @Override
         public boolean equals(Object obj) {
             if (this == obj)
@@ -81,18 +79,16 @@ public class ServerResources {
                 return false;
             return true;
         }
-        
-        
-        
+
     }
 
     private static ObjectMapper mapper = new ObjectMapper();
     public static final Person defaultPerson = new Person("ribbon", 1);
-    
+
     public static final List<Person> persons = Lists.newArrayList();
-    
+
     public static final List<String> streamContent = Lists.newArrayList();
-    
+
     static {
         for (int i = 0; i < 1000; i++) {
             streamContent.add("data: line " + i);
@@ -101,14 +97,14 @@ public class ServerResources {
             persons.add(new Person(String.valueOf(i), 10));
         }
     }
-    
+
     @GET
     @Path("/person")
     public Response getPerson() throws IOException {
         String content = mapper.writeValueAsString(defaultPerson);
         return Response.ok(content).build();
     }
-    
+
     @GET
     @Path("/persons")
     public Response getPersons() throws IOException {
@@ -116,13 +112,13 @@ public class ServerResources {
         return Response.ok(content).build();
     }
 
-    
+
     @GET
     @Path("/noEntity")
     public Response getNoEntity() {
         return Response.ok().build();
     }
-    
+
     @GET
     @Path("/readTimeout")
     public Response getReadTimeout() throws IOException, InterruptedException {
@@ -131,7 +127,7 @@ public class ServerResources {
         return Response.ok(content).build();
     }
 
-    
+
     @POST
     @Path("/person")
     public Response createPerson(String content) throws IOException {
@@ -139,23 +135,23 @@ public class ServerResources {
         Person person = mapper.readValue(content, Person.class);
         return Response.ok(mapper.writeValueAsString(person)).build();
     }
-    
+
     @GET
     @Path("/personQuery")
     public Response queryPerson(@QueryParam("name") String name, @QueryParam("age") int age) throws IOException {
         Person person = new Person(name, age);
         return Response.ok(mapper.writeValueAsString(person)).build();
     }
-    
+
     @GET
     @Path("/stream")
     @Produces("text/event-stream")
     public StreamingOutput getStream() {
-        return new StreamingOutput() {            
+        return new StreamingOutput() {
             @Override
             public void write(OutputStream output) throws IOException,
                     WebApplicationException {
-                for (String line: streamContent) {
+                for (String line : streamContent) {
                     String eventLine = line + "\n\n";
                     output.write(eventLine.getBytes("UTF-8"));
                 }
@@ -163,16 +159,16 @@ public class ServerResources {
             }
         };
     }
-    
+
     @GET
     @Path("/personStream")
     @Produces("text/event-stream")
     public StreamingOutput getPersonStream() {
-        return new StreamingOutput() {            
+        return new StreamingOutput() {
             @Override
             public void write(OutputStream output) throws IOException,
                     WebApplicationException {
-                for (Person p: persons) {
+                for (Person p : persons) {
                     String eventLine = "data: " + mapper.writeValueAsString(p)
                             + "\n\n";
                     output.write(eventLine.getBytes("UTF-8"));
@@ -182,15 +178,15 @@ public class ServerResources {
         };
     }
 
-    
+
     @GET
     @Path("/customEvent")
     public StreamingOutput getCustomeEvents() {
-        return new StreamingOutput() {            
+        return new StreamingOutput() {
             @Override
             public void write(OutputStream output) throws IOException,
                     WebApplicationException {
-                for (String line: streamContent) {
+                for (String line : streamContent) {
                     String eventLine = line + "\n";
                     output.write(eventLine.getBytes("UTF-8"));
                 }
@@ -199,7 +195,7 @@ public class ServerResources {
         };
     }
 
-    
+
     @GET
     @Path("/getXml")
     @Produces("application/xml")
